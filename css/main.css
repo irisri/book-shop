@@ -1,32 +1,5 @@
-body {
-    text-align: center;
-    background-color: aquamarine;
-}
-
-
-table, th, td {
-    margin: 0px auto;
-    border: 1px solid black;
-    border-collapse: collapse;
-}
-
-th, td {
-    padding: 5px;
-    text-align: left;    
-    margin: 5px;
-}
-
-.add-book {
-    margin: 10px;
-}
-
-input {
-    margin: 5px;
-}
-
-
-button {
-    margin: 5px;
+table .btn {
+    display: block;
 }
 
 .modal {
@@ -38,4 +11,8 @@ button {
     height: 100%;
     min-width: 300px;
     text-align: center;
+}
+
+.rtl {
+    direction: rtl;
 }

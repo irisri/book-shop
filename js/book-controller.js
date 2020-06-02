@@ -7,56 +7,57 @@ function onInit() {
 function renderBooks() {
     var books = getBooks();
     var strHTML = books.map(book =>
-        `<tr><td>${book.id}</td><td>${book.name}</td><td>${book.price}</td>
-        <td><button onclick="onRead('${book.id}')">Read</button></td>
-        <td><button onclick="onUpdate('${book.id}')">Update</button></td>
-        <td><button onclick="onRemoveBook('${book.id}')">Delete</button></td>
+        `<tr><th class="align-middle">${book.id}</td>
+        <td class="align-middle" scope="row">${book.name}</td>
+        <td class="align-middle">${book.price}</td>
+        <div class="text-center">
+        <td><button onclick="onRead('${book.id}')" class="rounded btn btn-primary mx-auto" data-trans="read">Read</button></td>
+        <td><button onclick="onUpdate('${book.id}')" class="rounded btn btn-warning mx-auto" data-trans="update">Update</button></td>
+        <td><button onclick="onRemoveBook('${book.id}')" class="rounded btn btn-danger mx-auto" data-trans="remove">Delete</button></td>
+        </div>
         </tr>`);
-    document.querySelector('.book-list').innerHTML = strHTML.join('');
+    $('.book-list').html(strHTML.join(''));
+    (!hasNext()) ? $('.next').addClass('invisible') : $('.next').removeClass('invisible'); 
+    (!hasPrev()) ? $('.prev').removeClass('invisible') : $('.prev').addClass('invisible');
 }
 
 function onRead(bookId) {
-    var book = _getBookById(bookId);
-    var elModal = document.querySelector('.modal');
-    elModal.querySelector('h4').innerHTML = book.name;
-    elModal.querySelector('.price').innerHTML = book.price;
-    elModal.querySelector('img').setAttribute('src', book.img);
-    var rateButtons = `<button onclick="onAddOrSubs('${bookId}', false)">-</button>
+    var book = getBookById(bookId);
+    var elModalRead = $('.modal-read')
+    elModalRead.modal('show');
+    $('.modal-read h4').text(book.name);
+    $('.price').text(book.price);
+    $('.modal-read img').attr('src', book.img);
+    var rateButtons = `<button onclick="onAddOrSubs('${bookId}', false)" class="rounded btn btn-secondary my-2 mx-2">-</button>
         <span class="rate">${book.rate}</span>
-        <button onclick="onAddOrSubs('${bookId}', true)">+</button>
-        <div><button onclick="onCloseModal()">Close</button></div>`;
-    elModal.querySelector('.rate-container').innerHTML = rateButtons;
-    elModal.hidden = false;
-}
-
-function onCloseModal() {
-    return document.querySelector('.modal').hidden = true;
+        <button onclick="onAddOrSubs('${bookId}', true)" class="rounded btn btn-secondary my-2 mx-2">+</button>`;
+    $('.rate-container').html(rateButtons);
 }
 
 function onAddOrSubs(bookId, isAdd) {
-    var rate = _getBookById(bookId).rate;
+    var rate = getBookById(bookId).rate;
     (isAdd) ? rate++ : rate--;
     if (rate > 10) return;
     if (rate < 0) return;
     updateRate(bookId, isAdd);
-    document.querySelector('.rate').innerHTML = rate;
+    $('.rate').html(rate);
 }
 
 
 function onUpdate(bookId) {
-    // onUpdateBook(bookId);
-    var price = prompt('Enter new price');
+    var elModalUpdate = $('.modal-update');
+    elModalUpdate.modal('show');
+    $('.modal-update h5').text(getBookById(bookId).name);
+    $('.save').attr('onclick', `onUpdatePrice('${bookId}')`);
+}
+
+function onUpdatePrice(bookId) {
+    var price = $('.update-price').val();
     if (!price) return;
     updateBook(bookId, price);
     renderBooks()
+    $('.modal-update').modal('hide');
 }
-
-// function onUpdateBook(bookId) {
-//     var price = prompt('Enter new price');
-//     if(!price) return;
-//     updateBook(bookId, price);
-//     renderBooks();
-// }
 
 function onRemoveBook(bookId) {
     removeBook(bookId);
@@ -64,8 +65,8 @@ function onRemoveBook(bookId) {
 }
 
 function onAddBook() {
-    var bookName = document.querySelector('[name=book-name').value;
-    var bookPrise = +document.querySelector('[name=price]').value;
+    var bookName = $('[name=book-name').val();
+    var bookPrise = +$('[name=price]').val();
     if (!bookName || !bookPrise) {
         alert('You didn\'t enter something!');
         document.querySelector('[name=book-name').value = '';
@@ -73,6 +74,23 @@ function onAddBook() {
         return;
     }
     addBook(bookName, bookPrise);
+    $('[name=book-name').val('');
+    $('[name=price]').val('')
     renderBooks();
 }
 
+function onSetLang(lang) {
+    setLang(lang);
+    (lang === 'he') ? $('body').addClass('rtl') : $('body').removeClass('rtl');
+    doTrans();
+}
+
+function onNextPage() {
+    nextPage();
+    renderBooks();
+}
+
+function onPrevPage() {
+    prevPage();
+    renderBooks();
+}

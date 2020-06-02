@@ -1,34 +1,39 @@
 'use strict'
 
 var gBooks = _createBooks();
+const PAGE_SIZE = 3;
+var gPageIdx = 0;
+
+function getBooks() {
+    var startIndex = gPageIdx * PAGE_SIZE;
+    return gBooks.slice(startIndex, startIndex + PAGE_SIZE);
+}
 
 function _createBooks() {
     var books = loadFromStorage('books');
     if (!books || !books.length) {
         var booksNameImg = [
-            ['Ender\'s Game', 'img/Ender\'s Game.jpg'],
-            ['Dune', 'img/Dune.jpg'],
-            ['Good Omens', 'img/Good Omens.jpg']
+            'Ender\'s Game',
+            'Dune',
+            'Good Omens',
+            'The Hitchhiker\'s Guide to the Galaxy',
+            'The Shadow of the Wind'
         ];
-        books = booksNameImg.map(book => _createBook(book[0], book[1]));
+        books = booksNameImg.map(book => _createBook(book));
         saveToStorage('books', books);
     }
     return books;
 }
 
 function _createBook(txt, url, price = getRandomIntInclusive(50, 100)) {
-    if (!price) price ;
+    if (!price) price;
     return {
         id: makeId(),
         name: txt,
         price: price,
-        img: url,
+        img: `img/${txt}.jpg`,
         rate: 0
     }
-}
-
-function getBooks() {
-    return gBooks;
 }
 
 function removeBook(bookId) {
@@ -45,23 +50,37 @@ function addBook(name, price) {
 }
 
 function updateBook(bookId, bookPrice) {
-    var book = _getBookById(bookId);
-    // var bookIndex = getBookIndex(bookId);
+    var book = getBookById(bookId);
     book.price = bookPrice;
-    // gBooks[bookIndex];
     saveToStorage('books', gBooks);
 }
 
 function updateRate(bookId, isAdd) {
-    (isAdd) ? _getBookById(bookId).rate++ : _getBookById(bookId).rate--;
+    (isAdd) ? getBookById(bookId).rate++ : getBookById(bookId).rate--;
     saveToStorage('books', gBooks);
 }
 
-function _getBookById(bookId) {
+function getBookById(bookId) {
     var book = gBooks.find(book => book.id === bookId);
     return book;
 }
 
 function _getBookIndex(bookId) {
     return gBooks.findIndex(book => book.id === bookId)
+}
+
+function nextPage() {
+    gPageIdx++;
+}
+
+function prevPage() {
+    gPageIdx--;
+}
+
+function hasNext() {
+    return (gPageIdx + 1) * PAGE_SIZE < gBooks.length
+}
+
+function hasPrev() {
+    return gPageIdx === 0; 
 }
